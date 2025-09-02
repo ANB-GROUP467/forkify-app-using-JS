@@ -1,0 +1,352 @@
+.header {
+  grid-area: head;
+  background-color: $color-grey-light-1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__logo {
+    margin-left: 4rem;
+    height: 4.6rem;
+    display: block;
+  }
+}
+
+.search {
+  background-color: #fff;
+  border-radius: 10rem;
+  display: flex;
+  align-items: center;
+  padding-left: 3rem;
+  transition: all 0.3s;
+
+  &:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 0.7rem 3rem rgba($color-grey-dark-1, 0.08);
+  }
+
+  &__field {
+    border: none;
+    background: none;
+    font-family: inherit;
+    color: inherit;
+    font-size: 1.7rem;
+    width: 30rem;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $color-grey-light-3;
+    }
+
+    @media only screen and (max-width: $bp-medium) {
+      width: auto;
+
+      &::placeholder {
+        color: white;
+      }
+    }
+  }
+
+  &__btn {
+    font-weight: 600;
+    font-family: inherit;
+  }
+}
+
+.nav {
+  align-self: stretch;
+  margin-right: 2.5rem;
+
+  &__list {
+    list-style: none;
+    display: flex;
+    height: 100%;
+  }
+
+  &__item {
+    position: relative;
+  }
+
+  &__btn {
+    height: 100%;
+    font-family: inherit;
+    color: inherit;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 1.5rem;
+    transition: all 0.3s;
+
+    display: flex;
+    align-items: center;
+
+    svg {
+      height: 2.4rem;
+      width: 2.4rem;
+      fill: $color-primary;
+      margin-right: 0.7rem;
+      transform: translateY(-1px);
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      background-color: $color-grey-light-2;
+    }
+  }
+  &--mealplan {
+    position: relative;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+
+      &::before {
+        content: '📋';
+        font-size: 1.6rem;
+      }
+    }
+
+    // Show dropdown on hover
+    &:hover + .mealplan,
+    &:focus + .mealplan {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+}
+
+.bookmarks {
+  padding: 1rem 0;
+  position: absolute;
+  // right: 0;
+  right: -2.5rem;
+  z-index: 10;
+  width: 40rem;
+  background-color: #fff;
+  box-shadow: 0 0.8rem 5rem 2rem rgba($color-grey-dark-1, 0.1);
+
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.5s 0.2s;
+
+  &__list {
+    list-style: none;
+  }
+
+  &__field {
+    cursor: pointer;
+    padding: 0 4rem;
+
+    display: flex;
+    align-items: center;
+    height: 100%;
+    transition: all 0.3s;
+
+    &:hover {
+      background-color: $color-grey-light-2;
+    }
+  }
+
+  &:hover,
+  .nav__btn--bookmarks:hover + & {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.mealplan {
+  position: absolute;
+  top: calc(100% + 1rem);
+  right: 0;
+  background-color: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.15);
+  min-width: 32rem;
+  max-width: 40rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-1rem);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  padding: 2rem 0;
+
+  // Keep dropdown visible when hovering over it
+  &:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  // Arrow pointing to button
+  &::before {
+    content: '';
+    position: absolute;
+    top: -0.8rem;
+    right: 2rem;
+    width: 0;
+    height: 0;
+    border-left: 0.8rem solid transparent;
+    border-right: 0.8rem solid transparent;
+    border-bottom: 0.8rem solid #fff;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 50rem;
+    overflow-y: auto;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 0.6rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 1rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #f38e82;
+      border-radius: 1rem;
+
+      &:hover {
+        background: #e07a67;
+      }
+    }
+  }
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  color: #968b87;
+
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(to right bottom, #fbdb89, #f48982);
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    svg {
+      width: 2.4rem;
+      height: 2.4rem;
+      fill: #fff;
+    }
+  }
+
+  p {
+    font-size: 1.4rem;
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .nav {
+    &__btn {
+      padding: 1rem 1.5rem;
+      font-size: 1.2rem;
+
+      &--mealplan span::before {
+        font-size: 1.4rem;
+      }
+    }
+  }
+
+  .mealplan {
+    min-width: 28rem;
+    right: -2rem;
+
+    &::before {
+      right: 3rem;
+    }
+  }
+
+  .message {
+    padding: 2rem 1.5rem;
+    flex-direction: column;
+    text-align: center;
+
+    div {
+      width: 3.5rem;
+      height: 3.5rem;
+
+      svg {
+        width: 2rem;
+        height: 2rem;
+      }
+    }
+
+    p {
+      font-size: 1.3rem;
+    }
+  }
+}
+
+// Animation for when meals are added
+.mealplan__item {
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid #f2efee;
+  transition: all 0.3s;
+  animation: slideInFromRight 0.3s ease-out;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: #f9f5f3;
+    padding-left: 3rem;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Additional state classes
+.mealplan--loading {
+  .message {
+    div svg {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

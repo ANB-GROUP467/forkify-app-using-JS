@@ -1,0 +1,27 @@
+.sort-options {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 2rem;
+}
+
+.sort-label {
+  font-weight: 600;
+}
+
+.sort-btn {
+  font-size: 1.3rem;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  background-color: #f9f5f3;
+  color: #f38e82;
+  border: 1px solid #f38e82;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #f38e82;
+    color: #fff;
+  }
+}

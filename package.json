@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "forkify",
+  "version": "1.0.0",
+  "description": "Recipe",
+  "license": "ISC",
+  "author": "ALYAN",
+  "type": "commonjs",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html --dist-dir ./dist --public-url ./",
+    "dev": "parcel index.html"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.15.2",
+    "parcel": "^2.15.2",
+    "sass": "^1.89.2"
+  },
+  "dependencies": {
+    "core-js": "^3.43.0",
+    "fraction.js": "^5.2.2",
+    "fracty": "^1.0.12",
+    "regenerator-runtime": "^0.14.1"
+  }
+}

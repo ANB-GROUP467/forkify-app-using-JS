@@ -1,0 +1,268 @@
+import * as model from './model.js';
+import { MODAL_CLOSE_SEC } from './config.js';
+import recipeView from './views/recipeView.js';
+import searchView from './views/searchView.js';
+import resultsView from './views/resultsView.js';
+import paginationView from './views/paginationView.js';
+import bookmarksView from './views/bookmarksView.js';
+import addRecipeView from './views/addRecipeView.js';
+
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+import { async } from 'regenerator-runtime';
+
+const controlRecipes = async function () {
+  try {
+    const id = window.location.hash.slice(1);
+
+    if (!id) return;
+    recipeView.renderSpinner();
+
+    // 0) Update results view to mark selected search result
+    resultsView.update(model.getSearchResultsPage());
+
+    // 1) Updating bookmarks view
+    bookmarksView.update(model.state.bookmarks);
+
+    // 2) Loading recipe
+    await model.loadRecipe(id);
+
+    // 3) Rendering recipe
+    recipeView.render(model.state.recipe);
+  } catch (err) {
+    recipeView.renderError();
+    console.error(err);
+  }
+};
+
+const controlSearchResults = async function () {
+  try {
+    resultsView.renderSpinner();
+
+    // 1) Get search query
+    const query = searchView.getQuery();
+    if (!query) return;
+
+    // 2) Load search results
+    await model.loadSearchResults(query);
+
+    // 3) Render results
+    resultsView.render(model.getSearchResultsPage());
+
+    // 4) Render initial pagination buttons
+    paginationView.render(model.state.search);
+
+    // 5) Render sort options
+    sortView.render();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const controlPagination = function (goToPage) {
+  // 1) Render NEW results
+  resultsView.render(model.getSearchResultsPage(goToPage));
+
+  // 2) Render NEW pagination buttons
+  paginationView.render(model.state.search);
+};
+
+const controlServings = function (newServings) {
+  // Update the recipe servings (in state)
+  model.updateServings(newServings);
+
+  // Update the recipe view
+  recipeView.update(model.state.recipe);
+};
+
+const controlAddBookmark = function () {
+  // 1) Add/remove bookmark
+  if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe);
+  else model.deleteBookmark(model.state.recipe.id);
+
+  // 2) Update recipe view
+  recipeView.update(model.state.recipe);
+
+  // 3) Render bookmarks
+  bookmarksView.render(model.state.bookmarks);
+};
+
+const controlBookmarks = function () {
+  bookmarksView.render(model.state.bookmarks);
+};
+
+const controlAddRecipe = async function (newRecipe) {
+  try {
+    // Show loading spinner
+    addRecipeView.renderSpinner();
+
+    // Upload the new recipe data
+    await model.uploadRecipe(newRecipe);
+    console.log(model.state.recipe);
+
+    // Render recipe
+    recipeView.render(model.state.recipe);
+
+    // Success message
+    addRecipeView.renderMessage();
+
+    // Render bookmark view
+    bookmarksView.render(model.state.bookmarks);
+
+    // Change ID in URL
+    window.history.pushState(null, '', `#${model.state.recipe.id}`);
+
+    // Close form window
+    setTimeout(function () {
+      addRecipeView.toggleWindow();
+    }, MODAL_CLOSE_SEC * 1000);
+  } catch (err) {
+    console.error('💥', err);
+    addRecipeView.renderError(err.message);
+  }
+};
+
+const controlMealPlanner = function () {
+  // Set meal planning mode
+  model.setMealPlanActive(true);
+
+  // Render the meal planner
+  mealPlannerView.render(model.state.mealPlan);
+
+  // Register event handlers - View handles the events, Controller provides the logic
+  mealPlannerView.addHandlerSearch(controlMealPlannerSearch);
+  mealPlannerView.addHandlerAddRecipe(controlAddRecipeToMealPlan);
+  mealPlannerView.addHandlerRemoveRecipe(controlRemoveRecipeFromMealPlan);
+  mealPlannerView.addHandlerAssignRecipe(controlAssignRecipeToMeal);
+  mealPlannerView.addHandlerRemoveMeal(controlClearMealFromSlot);
+  mealPlannerView.addHandlerSavePlan(controlSaveMealPlan);
+  mealPlannerView.addHandlerClearPlan(controlClearMealPlan);
+};
+
+const controlMealPlannerSearch = async function (query) {
+  try {
+    // Show loading
+    mealPlannerView.showLoading();
+
+    // Load search results
+    await model.loadSearchResults(query);
+
+    // Get first page results
+    const resultsPage = model.getSearchResultsPage(1);
+
+    // Render search results in meal planner
+    mealPlannerView.renderSearchResults(resultsPage);
+  } catch (err) {
+    console.error('Search error:', err);
+    mealPlannerView.showError(
+      'Failed to load search results. Please try again.'
+    );
+  }
+};
+
+const controlAddRecipeToMealPlan = async function (id) {
+  try {
+    // Load the full recipe data
+    await model.loadRecipe(id);
+
+    // Add to meal plan
+    model.addRecipeToMealPlan(model.state.recipe);
+
+    // Update the view
+    mealPlannerView.updateSelectedRecipes(model.state.mealPlan.selectedRecipes);
+    mealPlannerView.showMessage('Recipe added to meal plan!');
+  } catch (err) {
+    console.error('Add recipe error:', err);
+    mealPlannerView.showMessage(
+      'Failed to add recipe. Please try again.',
+      'error'
+    );
+  }
+};
+
+const controlRemoveRecipeFromMealPlan = function (recipeId) {
+  try {
+    model.removeRecipeFromMealPlan(recipeId);
+
+    // Update views
+    mealPlannerView.updateSelectedRecipes(model.state.mealPlan.selectedRecipes);
+    mealPlannerView.updateWeeklyCalendar(model.state.mealPlan.weekPlan);
+    mealPlannerView.showMessage('Recipe removed from meal plan.');
+  } catch (err) {
+    console.error('Remove recipe error:', err);
+    mealPlannerView.showMessage(
+      'Failed to remove recipe. Please try again.',
+      'error'
+    );
+  }
+};
+
+const controlAssignRecipeToMeal = function (recipeId, day, mealType) {
+  try {
+    model.assignRecipeToMeal(recipeId, day, mealType);
+    mealPlannerView.updateWeeklyCalendar(model.state.mealPlan.weekPlan);
+    mealPlannerView.showMessage(`Recipe assigned to ${day} ${mealType}!`);
+  } catch (err) {
+    console.error('Assign recipe error:', err);
+    mealPlannerView.showMessage(
+      'Failed to assign recipe. Please try again.',
+      'error'
+    );
+  }
+};
+
+const controlClearMealFromSlot = function (day, mealType) {
+  try {
+    model.clearMealFromSlot(day, mealType);
+    mealPlannerView.updateWeeklyCalendar(model.state.mealPlan.weekPlan);
+    mealPlannerView.showMessage('Meal cleared from calendar.');
+  } catch (err) {
+    console.error('Clear meal error:', err);
+    mealPlannerView.showMessage(
+      'Failed to clear meal. Please try again.',
+      'error'
+    );
+  }
+};
+
+const controlSaveMealPlan = function () {
+  try {
+    // Meal plan is automatically saved via localStorage in model
+    mealPlannerView.showMessage('Meal plan saved successfully!');
+  } catch (err) {
+    console.error('Save meal plan error:', err);
+    mealPlannerView.showMessage(
+      'Failed to save meal plan. Please try again.',
+      'error'
+    );
+  }
+};
+
+const controlClearMealPlan = function () {
+  try {
+    model.clearAllMealPlan();
+
+    // Update views
+    mealPlannerView.updateSelectedRecipes(model.state.mealPlan.selectedRecipes);
+    mealPlannerView.updateWeeklyCalendar(model.state.mealPlan.weekPlan);
+    mealPlannerView.showMessage('Meal plan cleared!');
+  } catch (err) {
+    console.error('Clear meal plan error:', err);
+    mealPlannerView.showMessage(
+      'Failed to clear meal plan. Please try again.',
+      'error'
+    );
+  }
+};
+
+const init = function () {
+  bookmarksView.addHandlerRender(controlBookmarks);
+  recipeView.addHandlerRender(controlRecipes);
+  recipeView.addHandlerUpdateServings(controlServings);
+  recipeView.addHandlerAddBookmark(controlAddBookmark);
+  searchView.addHandlerSearch(controlSearchResults);
+  paginationView.addHandlerClick(controlPagination);
+  addRecipeView.addHandlerUpload(controlAddRecipe);
+  console.log('WELCOME TO THE GITHUB');
+};
+init();

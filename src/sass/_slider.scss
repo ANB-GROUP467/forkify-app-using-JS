@@ -1,0 +1,214 @@
+// ==============================
+// MIXINS
+// ==============================
+@mixin center-absolute {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// ==============================
+// VARIABLES
+// ==============================
+$color-primary: #f38e82;
+$color-white: #fff;
+$color-black: #000;
+$transition-fast: all 0.3s ease;
+$transition-slow: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$box-shadow-light: 0 1rem 3rem rgba($color-black, 0.1);
+$box-shadow-medium: 0 1.5rem 4rem rgba($color-black, 0.15);
+
+$gradient: linear-gradient(to right bottom, $color-grad-1, $color-grad-2);
+
+// ==============================
+// SLIDER COMPONENT
+// ==============================
+.slider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 8rem;
+  position: relative;
+  margin: 2rem auto;
+
+  &__icon {
+    &--day,
+    &--night {
+      width: 2.4rem;
+      height: 2.4rem;
+      fill: currentColor;
+      z-index: 10;
+      transition: $transition-fast;
+    }
+  }
+
+  &__circle {
+    position: absolute;
+    left: 10%;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background-color: $gradient;
+    z-index: 5;
+    transition: $transition-slow;
+    box-shadow: $box-shadow-light;
+  }
+}
+
+// ==============================
+// NAVIGATION COMPONENT
+// ==============================
+.navigation {
+  position: relative;
+  z-index: 5000;
+
+  &__checkbox {
+    display: none;
+
+    // Checked states
+    &:checked ~ .navigation__background {
+      transform: scale(80);
+    }
+
+    &:checked ~ .navigation__nav {
+      opacity: 1;
+      width: 100%;
+      visibility: visible;
+    }
+
+    // Hamburger transformation
+    &:checked + .navigation__button .navigation__icon {
+      background-color: transparent;
+
+      &::before {
+        top: 0;
+        transform: rotate(135deg);
+      }
+
+      &::after {
+        top: 0;
+        transform: rotate(-135deg);
+      }
+    }
+  }
+
+  &__button {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background-color: $color-white;
+    z-index: 2000;
+    box-shadow: $box-shadow-light;
+    text-align: center;
+    cursor: pointer;
+
+    &:hover .navigation__icon::before {
+      top: -0.8rem;
+    }
+
+    &:hover .navigation__icon::after {
+      top: 0.8rem;
+    }
+  }
+
+  &__background {
+    position: fixed;
+    top: 2.5rem;
+    right: 2.5rem;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background-image: radial-gradient(
+      $color-primary,
+      darken($color-primary, 15%)
+    );
+    z-index: 1000;
+    transition: $transition-slow;
+  }
+
+  &__nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100vh;
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: $transition-slow;
+  }
+
+  &__list {
+    @include center-absolute;
+    list-style: none;
+    text-align: center;
+    width: 100%;
+  }
+
+  &__item {
+    margin: 1.5rem;
+  }
+
+  &__link {
+    &:link,
+    &:visited {
+      display: inline-block;
+      font-size: 2rem;
+      font-weight: 300;
+      color: $color-white;
+      text-decoration: none;
+      text-transform: uppercase;
+      padding: 1rem 2rem;
+      background-image: linear-gradient(
+        120deg,
+        transparent 0%,
+        transparent 50%,
+        $color-white 50%
+      );
+      background-size: 250%;
+      transition: $transition-fast;
+    }
+
+    &:hover,
+    &:active {
+      background-position: 100%;
+      color: $color-primary;
+      transform: translateX(1rem);
+    }
+  }
+
+  // Hamburger icon
+  &__icon {
+    position: relative;
+    margin-top: 2.4rem;
+
+    &,
+    &::before,
+    &::after {
+      width: 2.5rem;
+      height: 2px;
+      background-color: $color-black;
+      display: inline-block;
+      transition: $transition-fast;
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+    }
+
+    &::before {
+      top: -0.7rem;
+    }
+
+    &::after {
+      top: 0.7rem;
+    }
+  }
+}
